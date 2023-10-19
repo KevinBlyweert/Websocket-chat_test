@@ -1,4 +1,45 @@
+// import Sprite from './classes/Sprite.js';
+// import Player from './classes/Player.js';
+// import Playground from './classes/Playground.js';
+
+let start = '';
+
 const socket = io();
+let myPseudo = '';
+const keys = {
+  rightPress: false,
+  leftPress: false,
+  upPress: false,
+};
+
+while (!myPseudo) {
+  myPseudo = prompt('Entrez votre pseudo:');
+}
+
+canvas.width = document.querySelector('#playground').offsetWidth;
+canvas.height = document.querySelector('#playground').offsetHeight;
+
+const player = new Player({ collisionBlocks });
+const playground = new Playground();
+
+function animate() {
+  window.requestAnimationFrame(animate);
+  if (!start) {
+    player.position.y = (playground.dimension.height * 2) / 3;
+    player.position.x = playground.dimension.width / 2;
+    start = 'init';
+  }
+  playground.update();
+  collisionBlocks.forEach((collisionBlock) => collisionBlock.draw());
+  player.velocity.x = 0;
+  if (keys.rightPress) player.velocity.x = 5;
+  else if (keys.leftPress) player.velocity.x = -5;
+  player.update();
+  const time = document.querySelector('#time');
+  time.textContent = new Date(Date.now()).toUTCString();
+}
+
+animate();
 
 const chatForm = document.querySelector('form');
 chatForm.addEventListener('submit', (event) => {
@@ -13,46 +54,96 @@ socket.on('message_reception', ({ pseudo, message }) => {
   const p = document.createElement('p');
   p.textContent = `${pseudo} : ${message}`;
   document.querySelector('#chatMess').appendChild(p);
+  p.scrollIntoView({ behavior: 'smooth' });
 });
 
-function getUserMouse(id) {
+function getUserAvatar(id) {
   return document.querySelector(`[data-id="${id}"]`);
 }
-function createUsermouse(pseudo, id) {
-  const pointer = document.createElement('div');
-  pointer.classsList.add('user-pointer');
-  pointer.setAttribute('data-id', id);
-  pointer.textContent = pseudo;
-  document.body.appendChild(pointer);
-  return pointer;
+function createUserAvatar(pseudo, id) {
+  const avatar = document.createElement('div');
+  avatar.classList.add('user-avatar');
+  avatar.setAttribute('data-id', id);
+  document.body.appendChild(avatar);
+  const avatarPseudo = document.createElement('p');
+  avatarPseudo.textContent = pseudo;
+  avatar.appendChild = avatarPseudo;
+  return avatar;
 }
 
-socket.on('mouse_reception', ({
+// socket.on('mouse_reception', ({
+//   pseudo, id, X, Y,
+// }) => {
+//   let userMouse = getUserAvatar(id);
+//   if (!userMouse) {
+//     userMouse = createUserAvatar(pseudo, id);
+//   }
+//   // console.log(X, Y);
+//   userMouse.style.left = `${X}px`;
+//   userMouse.style.top = `${Y}px`;
+// });
+socket.on('player_move', ({
   pseudo, id, X, Y,
 }) => {
-  let userMouse = getUserMouse(id);
-  if (!userMouse) {
-    userMouse = createUsermouse(pseudo, id);
+  let userAvatar = getUserAvatar(id);
+  if (!userAvatar) {
+    userAvatar = createUserAvatar(pseudo, id);
   }
-  console.log(X, Y);
-  userMouse.style.left = `${X}px`;
-  userMouse.style.top = `${Y}px`;
+  // console.log(X, Y);
+  userAvatar.style.left = `${X}px`;
+  userAvatar.style.top = `${Y}px`;
+  console.log(pseudo, id, X, Y);
 });
 
 socket.on('user-disconnected', (id) => {
-  const userMouse = getUserMouse(id);
-  userMouse?.remove();
+  const userAvatar = getUserAvatar(id);
+  userAvatar?.remove();
 });
 
-socket.on('time', (timestamp) => {
-  const p = document.createElement('p');
-  p.textContent = `Le serveur dit qu'il est ${new Date(timestamp)}`;
-  const chat = document.querySelector('#chatMess');
-  chat.appendChild(p);
-});
-
-const pseudo = prompt('Entrez votre pseudo:');
-socket.emit('pseudo', pseudo);
-document.body.addEventListener('mousemove', _.throttle(({ clientX, clientY }) => {
-  socket.emit('mousemove', { X: clientX, Y: clientY });
+socket.emit('pseudo', myPseudo);
+document.body.addEventListener('keydown', _.throttle(() => {
+  socket.emit('moving', { X: player.position.x, Y: player.position.y });
 }), 250, { leading: true, trailing: true });
+
+function keyDownHandler({ code }) {
+  if (code === 'ArrowRight') {
+    keys.rightPress = true;
+  } else if (code === 'ArrowLeft') {
+    keys.leftPress = true;
+  }
+  switch (code) {
+    case 'ArrowRight': case 'KeyD':
+      keys.rightPress = true;
+      break;
+    case 'ArrowLeft': case 'KeyA':
+      keys.leftPress = true;
+      break;
+    case 'ArrowUp': case 'KeyW':
+      if (player.velocity.y === 0) {
+        player.velocity.y = -15;
+      }
+      break;
+    default:
+      break;
+  }
+}
+function keyUpHandler({ code }) {
+  if (code === 'ArrowRight') {
+    keys.rightPress = false;
+  } else if (code === 'ArrowLeft') {
+    keys.leftPress = false;
+  }
+  switch (code) {
+    case 'ArrowRight': case 'KeyD':
+      keys.rightPress = false;
+      break;
+    case 'ArrowLeft': case 'KeyA':
+      keys.leftPress = false;
+      break;
+    default:
+      break;
+  }
+}
+
+window.addEventListener('keydown', keyDownHandler, false);
+window.addEventListener('keyup', keyUpHandler, false);

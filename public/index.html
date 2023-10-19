@@ -8,13 +8,27 @@
     <title>Socket.io</title>
 </head>
 <body>
-    <h1>Hello !</h1>
-    <div id="chatMess"></div>
-    <form>
-        <input type="text" id="chatInput" />
-    </form>
+    <h1>Welcome to the C45tl3 !</h1>
+    <div id="game">
+        <canvas id="playground">
+            Votre navigateur ne supporte pas canvas.
+        </canvas>
+    </div>
+    <div id="chatBox">
+        <div id="time"></div>
+        <div id="chatMess"></div>
+        <form>
+            <input type="text" id="chatInput" />
+        </form>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
-    <script src="./js/main.js" type="module"></script>
+    <script src="./js/classes/Sprite.js"></script>
+    <script src="./js/classes/CollisionBlock.js"></script>
+    <script src="./js/collisions.js"></script>
+    <script src="./js/classes/Playground.js"></script>
+    <script src="./js/classes/Obstacles.js"></script>
+    <script src="./js/classes/Player.js"></script>
+    <script src="./js/main.js"></script>
 </body>
 </html>

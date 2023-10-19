@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx nodemon .",
+    "dev": "node-dev .",
     "debug": " DEBUG=ws:* npx nodemon .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

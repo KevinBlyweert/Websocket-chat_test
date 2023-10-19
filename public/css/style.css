@@ -46,9 +46,19 @@
     width: 100%;
     height: 100%;
   }
-  .user-pointer{
+  /* .user-pointer{
     position:fixed;
     transition: all .25s;
+  } */
+  .user-avatar{
+    width: 16px;
+    height: 16px;
+    position:fixed;
+    transition: all .25s;
+    background-color: black;
+  }
+  .user-avatar>p{
+    text-align: center;
   }
   form{
     position: relative;

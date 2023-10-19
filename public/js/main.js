@@ -64,10 +64,8 @@ function createUserAvatar(pseudo, id) {
   const avatar = document.createElement('div');
   avatar.classList.add('user-avatar');
   avatar.setAttribute('data-id', id);
-  document.body.appendChild(avatar);
-  const avatarPseudo = document.createElement('p');
-  avatarPseudo.textContent = pseudo;
-  avatar.appendChild = avatarPseudo;
+  avatar.setAttribute('position', 'absolute');
+  document.querySelector('#game').appendChild(avatar);
   return avatar;
 }
 
@@ -90,9 +88,12 @@ socket.on('player_move', ({
     userAvatar = createUserAvatar(pseudo, id);
   }
   // console.log(X, Y);
-  userAvatar.style.left = `${X}px`;
-  userAvatar.style.top = `${Y}px`;
-  console.log(pseudo, id, X, Y);
+  userAvatar.style.left = `calc(${X}px + 20px)`;
+  userAvatar.style.top = `calc(${Y}px + 10vh)`;
+  userAvatar.replaceChildren();
+  const avatarPseudo = document.createElement('p');
+  avatarPseudo.textContent = pseudo;
+  userAvatar.appendChild(avatarPseudo);
 });
 
 socket.on('user-disconnected', (id) => {

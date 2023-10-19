@@ -31,7 +31,7 @@ function createWSServer(server) {
     //   });
     // });
     socket.on('moving', ({ X, Y }) => {
-      io.emit('player_move', {
+      socket.broadcast.emit('player_move', {
         pseudo: socket.data.pseudo, id: socket.id, X, Y,
       });
     });
